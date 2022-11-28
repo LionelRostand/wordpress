@@ -1,0 +1,19 @@
+version: '3'
+services:
+ wordpress:
+  image: wordpress:5.1.1-php7.1-apache
+  depends_on:
+  - mariadb
+  volumes:
+  - ./volumes/wordpress/content:/var/www/html/wp-content
+  environment:
+   WORDPRESS_DB_HOST: mariadb:3306
+   WORDPRESS_DB_PASSWORD: root
+  ports:
+  - 8001:80
+ mariadb:
+  image: mariadb:10.4.4
+  volumes:
+  - ./volumes/mariadb/data:/var/lib/mysql
+  environment:
+   MYSQL_ROOT_PASSWORD: root
