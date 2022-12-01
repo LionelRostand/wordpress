@@ -1,7 +1,4 @@
-version: '3.3'
-
-version: "2"
- 
+version: '3.3' 
 services:
    wordpress-db:
      container_name: wordpress-db
