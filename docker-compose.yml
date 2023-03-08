@@ -1,44 +1,32 @@
-version: "2"
- 
+version: '3.7'
+volumes:
+  wp-data:
+networks:
+  wp-back:
 services:
-   wordpress-db:
-     container_name: wordpress-db
-     image: mysql:5.7
-     volumes:
-       - /srv/docker/wordpress/db:/var/lib/mysql
-     restart: always
-     environment:
-       MYSQL_ROOT_PASSWORD: $ROOTPWD
-       MYSQL_DATABASE: wordpress
-       MYSQL_USER: $USER
-       MYSQL_PASSWORD: $PWD
- 
-   wordpress:
-     container_name: wordpress
-     depends_on:
-       - wordpress-db
-     image: wordpress:latest
-     ports:
-       - 8000:80
-     restart: always
-     volumes:
-       - /srv/docker/wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
-       - /srv/docker/wordpress/html:/var/www/html
-     environment:
-       WORDPRESS_DB_HOST: wordpress-db:3306
-       WORDPRESS_DB_USER: $USER
-       WORDPRESS_DB_PASSWORD: $PWD
-       WORDPRESS_DB_NAME: wordpress
-     
-   wordpress-pma:
-    image: phpmyadmin/phpmyadmin
-    container_name: wordpress-pma
-    depends_on:
-        - wordpress-db
+  db:
+    image: mysql:5.7
+    volumes:
+      - wp-data:/var/lib/mysql
     environment:
-        - PMA_HOST=wordpress-db
-        - PMA_PORT=3306
-        - PMA_ARBITRARY=1
-     ports:
-         - 8001:80
-    restart: always
+       MYSQL_ROOT_PASSWORD: rootPassword
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wp-user
+       MYSQL_PASSWORD: wp-pass
+    ports:
+      - 8889:3306
+    networks:
+      - wp-back
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      MYSQL_USER: wp-user
+      MYSQL_PASSWORD: wp-pass
+      MYSQL_ROOT_PASSWORD: rootPassword
+    ports: 
+      - 3001:80
+    networks:
+      - wp-bac
