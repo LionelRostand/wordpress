@@ -1,79 +1,40 @@
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv-volume
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/tmp/mysql/data"
-  persistentVolumeReclaimPolicy: Recycle
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pv-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress-mysql
-  labels:
-    app: wordpress-mysql
+  name: mariadb-internal-service
 spec:
-  ports:
-  - port: 3306
   selector:
-    app: wordpress-mysql
+    app: mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  clusterIP: None
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wordpress-mysql
-  labels:
-    app: wordpress-mysql
-spec:
+  name: mariadb-deployment
+spec: # specification for deployment resource
+  replicas: 1
   selector:
     matchLabels:
-      app: wordpress-mysql
-  strategy:
-    type: Recreate
-  template:
+      app: mariadb
+  template: # blueprint for Pod
     metadata:
       labels:
-        app: wordpress-mysql
-    spec:
+        app: mariadb # service will look for this label
+    spec: # specification for Pod
       containers:
-      - image: mysql:oracle
-        name: mysql
+      - name: mariadb
+        image: mariadb
+        ports:
+        - containerPort: 3306 #default one
         env:
-        - name: MYSQL_DATABASE
-          value: wordpress
-        - name: MYSQL_ROOT_PASSWORD
+        - name: MARIADB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-pass
-              key: password.txt
-        ports:
-        - containerPort: 3306
-          name: mysql
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
-      volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pv-claim
+              name: mariadb-secret
+              key: mariadb-root-password
+        - name: MARIADB_DATABASE
+          value: wordpress
