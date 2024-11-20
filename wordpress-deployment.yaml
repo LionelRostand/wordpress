@@ -37,15 +37,15 @@ metadata:
     app: wordpress
     tier: frontend
 spec:
-  ports:
-    - port: 80
-    - port: 443
+  type: NodePort
   selector:
     app: wordpress
     tier: frontend
-  type: LoadBalancer
-  externalIPs:
-  - 10.76.87.233
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 3007
+  
 ---
 apiVersion: apps/v1
 kind: Deployment
