@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # ClusterIssuer créé précédemment
+spec:
+  tls:
+  - hosts:
+      - votredomaine.com
+    secretName: wordpress-tls  # Secret TLS géré automatiquement
+  rules:
+  - host: votredomaine.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wordpress-service
+            port:
+              number: 80
