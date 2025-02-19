@@ -9,10 +9,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - wordpress.example.com
+        - www.neotech-consulting.com
       secretName: wordpress-tls
   rules:
-    - host: wordpress.example.com
+    - host: www.neotech-consulting.com
       http:
         paths:
           - path: /
