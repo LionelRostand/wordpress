@@ -28,3 +28,18 @@ spec:
             - name: WORDPRESS_DB_PASSWORD
               value: "password"
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+spec:
+  selector:
+    app: wordpress
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+  type: NodePort
