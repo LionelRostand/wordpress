@@ -1,21 +1,9 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pvc
-  namespace: wordpress
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  namespace: wordpress
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mysql
@@ -29,30 +17,13 @@ spec:
           image: mysql:5.7
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "rootpassword"
+              value: "root_password"
             - name: MYSQL_DATABASE
               value: "wordpress"
             - name: MYSQL_USER
-              value: "wpuser"
+              value: "user"
             - name: MYSQL_PASSWORD
-              value: "wppassword"
+              value: "password"
           ports:
             - containerPort: 3306
-          volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
-      volumes:
-        - name: mysql-persistent-storage
-          persistentVolumeClaim:
-            claimName: mysql-pvc
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql
-  namespace: wordpress
-spec:
-  ports:
-    - port: 3306
-  selector:
-    app: mysql
