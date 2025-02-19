@@ -9,22 +9,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: manual
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv
-  namespace: wordpress
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual
-  hostPath:
-    path: "/mnt/data1/mysql/"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,25 +19,23 @@ spec:
   selector:
     matchLabels:
       app: mysql
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
         app: mysql
     spec:
       containers:
-        - image: mysql:5.7
-          name: mysql
+        - name: mysql
+          image: mysql:5.7
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "rootpassword"
             - name: MYSQL_DATABASE
               value: "wordpress"
             - name: MYSQL_USER
-              value: "wordpress"
+              value: "wpuser"
             - name: MYSQL_PASSWORD
-              value: "wordpresspassword"
+              value: "wppassword"
           ports:
             - containerPort: 3306
           volumeMounts:
