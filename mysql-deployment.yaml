@@ -24,7 +24,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: "/mnt/data/mysql"
+    path: "/mnt/data/mysql/neo"
 ---
 apiVersion: apps/v1
 kind: Deployment
